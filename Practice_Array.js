@@ -118,19 +118,102 @@ function Counter() { // Counter 오브젝트 생성자 함수 선언
   this.sum = 0; // sum 프로퍼티 생성 및 값 할당 // this는 생성자 함수로 생성될 인스턴스
   this.count = 0; // count 프로퍼티 생성 및 값 할당// this는 생성자 함수로 생성될 인스턴스
 }
-Counter.prototype.add = function(array) { // Q prototype.add는 무엇인가
-  array.forEach(function(entry) {
+Counter.prototype.add = function(array) { // Q prototype.add는 무엇인가?
+  array.forEach(function(entry) { //entry는  array 배열 요소의 값
     this.sum += entry;
     this.count++;
-  }, );
+  }, this);
 };
 var obj = new Counter();
 obj.add([2, 5, 9]);
 console.log(obj.count);
 console.log(obj.sum);
 console.log(obj);
+console.log(Counter.prototype);
 
 // Array.prototype.map()
 // 배열을 순회하며 각 요소에 대하여 인자로 주어진 콜백함수의 반환값(결과값)으로 새로운 배열을 생성하여 반환한다.
 // 배열을 순회하면 요소 값을 다른 값으로 맵핑하기 위한 함수이다.
 // 원본 배열 변경되지 않는다
+
+var numbers = [1, 4, 9];
+
+var roots = numbers.map(function(item) {
+  return Math.sqrt(item); // item 값을 양의 제곱근 반환
+});
+
+// 변수 roots에 위 함수의 리턴 값을 담은 배열 할당됨
+console.log(roots);
+
+// 원본 배열은 변경하지 않는다.
+console.log(numbers);
+
+roots = numbers.map(function(item) {
+  return ++item // 리턴 하지 않으면 새로운 배열에 반영되지 않는다.
+});
+console.log(roots);
+
+
+// 두번째 인자로 this를 전달할 수 있다.
+function Prefixer(prefix) {
+  this.prefix = prefix;
+}
+
+Prefixer.prototype.prefixArray = function(arr) { // Q 객채에 배열요소를 맵핑해서 새로운 배열 생성?
+  return arr.map(function(x) {
+    return this.prefix + x;
+  }, this);
+};
+var pre = new Prefixer('-webkit-');
+console.log(pre);
+var preArr = pre.prefixArray(['linear-gradient', 'border-radius']);
+console.log(preArr);
+console.log(Prefixer.prototype);
+
+
+// Array.prototype.filter()
+// 콜백 함수의 실행 결과가 true인 배열 요소의 값만을 추출한 새로운 배열 반환
+// 배열에 특정 케이스만 추출 하여 새로운 배열 만들 때 사용
+// 두번째 인자로 this 전달 가능
+
+var result = [1, 2, 3, 4, 5].filter(function(item, index, array) {
+  console.log('[' + index + '] = ' + item);
+  return item % 2; // 각 요소값에 2를 나눈 Boolean값이 true 이면 반환 
+  // 나머지 값이 1이면 true, 0 이면 flase
+
+});
+console.log(result);
+
+
+// Array.prototype.reduce()
+// 배열을 순회하며 각 요소에 대하여 이전의 콜백함수 실행 반환값을 전달하여 콜백함수를 실행
+// 결과 반환
+// 콜백함수의 첫번째 인자는 이전 콜백함수 반환값이지만, 처음 호출 시에는 다른다
+// reduce메소드의 두번째 인자는 첫 호출에 첫 번째 인수로 사용되고 이를 initialValue라고한다
+// initialValue가 없을시 previousValue는 배열의 첫 번째 요소 값이고 currentValue는 두 번째 값이다.
+
+/*
+previousValue: 이전 콜백의 반환값
+currentValue : 배열 요소의 값
+currentIndex : 인덱스
+array        : 순회할 배열
+*/
+var result = [1, 2, 3, 4, 5].reduce(function(previousValue, currentValue,
+  currentIndex, array) {
+  console.log(previousValue + '+' + currentValue + '=' + (previousValue + currentValue));
+  return previousValue + currentValue; // 결과는 다음 콜백의 첫번째 인자로 전달된다
+});
+console.log(result);
+
+// 2차원 배열을 1차원화 할 때도 유용하다.
+var flattened = [
+  [0, 1],
+  [2, 3],
+  [4, 5]
+].reduce(function(a, b) {
+  return a.concat(b);
+});
+console.log(flattened);
+
+
+// 끝
